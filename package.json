@@ -1,0 +1,36 @@
+{
+  "name": "react-list-prototype",
+  "version": "1.0.0",
+  "description": "ag-grid in react",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html"
+  },
+  "jest": {
+    "setupTestFrameworkScriptFile": "<rootDir>/src/setupTests.js"
+  },
+  "dependencies": {
+    "ag-grid": "18.1.2",
+    "ag-grid-community": "18.1.2",
+    "ag-grid-react": "18.1.0",
+    "enzyme": "3.9.0",
+    "enzyme-adapter-react-16": "1.12.1",
+    "jest": "24.8.0",
+    "lodash": "4.17.11",
+    "pretty-format": "24.8.0",
+    "prop-types": "15.7.2",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-redux": "7.0.3",
+    "redux": "4.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.2.0",
+    "parcel-bundler": "^1.6.1"
+  },
+  "keywords": [
+    "react",
+    "ag-grid"
+  ]
+}
