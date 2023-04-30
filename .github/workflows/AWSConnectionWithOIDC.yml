@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
   push
 env:
-  AWS_REGION : "us-east-1"
+  AWS_REGION : "us-east-2"
   ECR_REPOSITORY: "ag-grid-demo"
   ECS_SERVICE: "ag-grid-demo-service"
   ECS_CLUSTER: "ag-grid-ex"
