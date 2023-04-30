@@ -3,7 +3,12 @@ name: Deploy to AWS
 on:
   push
 env:
-  AWS_REGION : "eu-west-2"   
+  AWS_REGION : "eu-west-2"
+  ECR_REPOSITORY: "ag-grid-demo"
+  ECS_SERVICE: "ag-grid-demo-service"
+  ECS_CLUSTER: "ag-grid-ex"
+  ECS_TASK_DEFINITION: ".aws/ag-grid-demo-task.json"
+  CONTAINER_NAME: "ag-grid-example"
 permissions:
       id-token: write   # This is required for requesting the JWT
       contents: read    # This is required for actions/checkout
