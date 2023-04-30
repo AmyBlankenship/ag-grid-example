@@ -1,29 +1,70 @@
-#For the provider URL: Use https://token.actions.githubusercontent.com
-#For the "Audience": Use sts.amazonaws.com 
-name: Deploy to AWS
+name: Deploy to Amazon ECS
+
 on:
-  push
+  push:
+    branches:
+      - main
+
 env:
-  AWS_REGION : "eu-west-2"   
+  AWS_REGION : "us-east-1"
+  ECR_REPOSITORY: "ag-grid-demo"
+  ECS_SERVICE: "ag-grid-demo-service"
+  ECS_CLUSTER: "ag-grid-ex"
+  ECS_TASK_DEFINITION: ".aws/ag-grid-demo-task.json"
+  CONTAINER_NAME: "ag-grid-example"
+
 permissions:
-      id-token: write   # This is required for requesting the JWT
-      contents: read    # This is required for actions/checkout
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
 jobs:
-  GithubOIDC:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
+    environment: production
+
     steps:
-      - name: Git clone the repository
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: configure aws credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::921477579682:role/Github
-          role-session-name: github_session
-          aws-region: ${{ env.AWS_REGION }}
+          with:
+            role-to-assume: arn:aws:iam::921477579682:role/Github
+            role-session-name: github_session
+            aws-region: ${{ env.AWS_REGION }}
 
-      - name: Print AWS SSM Parameter
-        run: aws ssm get-parameter --name=hello_aws-gh-oidc --query Parameter.Value
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Print assumed role
-        run: aws sts get-caller-identity
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+          id: task-def
+          uses: aws-actions/amazon-ecs-render-task-definition@v1
+          with:
+            task-definition: ${{ env.ECS_TASK_DEFINITION }}
+            container-name: ${{ env.CONTAINER_NAME }}
+            image: ${{ steps.build-image.outputs.image }}
+
+            - name: Deploy Amazon ECS task definition
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+              with:
+                task-definition: ${{ steps.task-def.outputs.task-definition }}
+                service: ${{ env.ECS_SERVICE }}
+                cluster: ${{ env.ECS_CLUSTER }}
+                wait-for-service-stability: true
+
+          wait-for-service-stability: true
