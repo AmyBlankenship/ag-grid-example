@@ -26,8 +26,9 @@ jobs:
           role-session-name: github_session
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Print AWS SSM Parameter
-        run: aws ssm get-parameter --name=hello_aws-gh-oidc --query Parameter.Value
+      - name: Login to Amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
 
       - name: Print assumed role
         run: aws sts get-caller-identity
