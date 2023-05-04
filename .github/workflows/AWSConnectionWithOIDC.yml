@@ -8,7 +8,7 @@ env:
   ECS_SERVICE: "ag-grid-demo-service"
   ECS_CLUSTER: "ag-grid-ex"
   ECS_TASK_DEFINITION: ".aws/ag-grid-demo-task.json"
-  CONTAINER_NAME: "ag-grid-demo"
+  CONTAINER_NAME: "ag-grid-example"
 permissions:
       id-token: write   # This is required for requesting the JWT
       contents: read    # This is required for actions/checkout
