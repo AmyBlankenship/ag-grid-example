@@ -5,7 +5,7 @@ on:
 env:
   AWS_REGION : "us-east-2"
   ECR_REPOSITORY: "ag-grid-demo"
-  ECS_SERVICE: "ag-grid-svc-demo"
+  ECS_SERVICE: "ag-grid-demo-svc"
   ECS_CLUSTER: "ag-grid-ex"
   ECS_TASK_DEFINITION: ".aws/ag-grid-demo-task.json"
   CONTAINER_NAME: "ag-grid-example"
@@ -50,3 +50,11 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
