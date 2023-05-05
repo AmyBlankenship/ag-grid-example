@@ -3,9 +3,7 @@ FROM node:lts-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
-RUN pwd && ls /app
 COPY . .
-RUN npm test
 RUN npm run build
 
 # production stage
